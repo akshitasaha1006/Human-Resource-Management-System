@@ -1,0 +1,305 @@
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:"Poppins",sans-serif;
+}
+
+body{
+  background:#F5F3FF;
+}
+
+.profile-page{
+  min-height:100vh;
+  background:#F5F3FF;
+}
+
+.profile-header{
+  height:320px;
+  background:linear-gradient(135deg,#6D28D9,#8B5CF6);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  position:relative;
+}
+
+.overlay{
+  text-align:center;
+  color:#fff;
+}
+
+.profile-image-wrapper{
+  position:relative;
+  display:inline-block;
+}
+
+.profile-image{
+  width:170px;
+  height:170px;
+  border-radius:50%;
+  border:6px solid #fff;
+  object-fit:cover;
+  box-shadow:0 15px 30px rgba(0,0,0,.25);
+}
+
+.change-photo-btn{
+  position:absolute;
+  right:8px;
+  bottom:8px;
+  border:none;
+  border-radius:999px;
+  padding:8px 12px;
+  font-size:13px;
+  font-weight:600;
+  color:#4C1D95;
+  background:#fff;
+  box-shadow:0 8px 18px rgba(0,0,0,.18);
+  cursor:pointer;
+  transition:transform .2s ease, box-shadow .2s ease;
+}
+
+.change-photo-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 20px rgba(0,0,0,.22);
+}
+
+.hidden-file-input{
+  display:none;
+}
+
+.overlay h1{
+  margin-top:20px;
+  font-size:38px;
+  font-weight:700;
+}
+
+.designation{
+  margin-top:8px;
+  font-size:18px;
+  opacity:.95;
+}
+
+.status{
+  display:inline-block;
+  margin-top:18px;
+  padding:10px 22px;
+  background:white;
+  color:#6D28D9;
+  border-radius:30px;
+  font-weight:600;
+}
+
+.profile-container{
+  max-width:1300px;
+  margin:-70px auto 40px;
+  padding:0 25px;
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:25px;
+}
+
+.card{
+  background:white;
+  border-radius:18px;
+  padding:25px;
+  margin-bottom:25px;
+  box-shadow:0 10px 25px rgba(0,0,0,.08);
+  transition:.3s;
+}
+
+.card:hover{
+  transform:translateY(-6px);
+}
+
+.card h2{
+  color:#6D28D9;
+  margin-bottom:22px;
+  border-left:5px solid #8B5CF6;
+  padding-left:12px;
+}
+
+.info-row{
+  display:flex;
+  justify-content:space-between;
+  padding:15px 0;
+  border-bottom:1px solid #ECECEC;
+}
+
+.info-row span{
+  color:#666;
+}
+
+.info-row strong{
+  color:#111827;
+} .document{
+  background:#F8F5FF;
+  border-left:5px solid #8B5CF6;
+  padding:15px;
+  border-radius:10px;
+  margin-bottom:15px;
+  font-weight:600;
+  color:#333;
+  transition:.3s;
+}
+
+.document:hover{
+  background:#EDE9FE;
+  transform:translateX(6px);
+}
+
+.performance-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:15px;
+}
+
+.performance-card{
+  background:linear-gradient(135deg,#7C3AED,#A855F7);
+  color:white;
+  text-align:center;
+  padding:20px;
+  border-radius:15px;
+  transition:.3s;
+}
+
+.performance-card:hover{
+  transform:scale(1.05);
+}
+
+.performance-card h3{
+  font-size:28px;
+  margin-bottom:8px;
+}
+
+.performance-card p{
+  font-size:14px;
+}
+
+.button-group{
+  display:flex;
+  gap:15px;
+  margin-top:20px;
+}
+
+.edit-btn,
+.download-btn{
+  flex:1;
+  padding:14px;
+  border:none;
+  border-radius:12px;
+  font-size:16px;
+  font-weight:600;
+  cursor:pointer;
+  transition:.3s;
+}
+
+.edit-btn{
+  background:#7C3AED;
+  color:white;
+}
+
+.edit-btn:hover{
+  background:#5B21B6;
+}
+
+.download-btn{
+  background:#111827;
+  color:white;
+}
+
+.download-btn:hover{
+  background:#000;
+}
+
+.photo-upload{
+  display:inline-flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+  margin:16px auto 0;
+  color:white;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.photo-upload input{
+  display:none;
+}
+
+.document-row{
+  background:#F8F5FF;
+  border-radius:12px;
+  padding:14px;
+  margin-bottom:15px;
+}
+
+.document-meta{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom:10px;
+  font-weight:600;
+}
+
+.uploaded-name{
+  font-size:14px;
+  color:#555;
+}
+
+.file-input{
+  width:100%;
+  padding:12px 14px;
+  border:1px solid #ddd;
+  border-radius:10px;
+  background:white;
+  cursor:pointer;
+}
+
+@media (max-width:992px){
+
+.profile-container{
+  grid-template-columns:1fr;
+  margin-top:-50px;
+}
+
+}
+
+@media (max-width:768px){
+
+.profile-header{
+  height:280px;
+}
+
+.profile-image{
+  width:130px;
+  height:130px;
+}
+
+.overlay h1{
+  font-size:28px;
+}
+
+.info-row{
+  flex-direction:column;
+  gap:6px;
+}
+
+.performance-grid{
+  grid-template-columns:1fr;
+}
+
+.button-group{
+  flex-direction:column;
+}
+
+}
+.edit-input{
+  width:100%;
+  padding:10px 14px;
+  border:2px solid #7c3aed;
+  border-radius:8px;
+  font-size:16px;
+  font-weight:600;
+  outline:none;
+}
