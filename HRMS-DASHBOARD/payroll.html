@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HRMS Payroll</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #FFFFFF;
+      --text: #111111;
+      --text-muted: #555555;
+      --border: #E5E5E5;
+      --accent: #7C5CFC;
+      --accent-light: rgba(124, 92, 252, 0.12);
+      --accent-hover: rgba(124, 92, 252, 0.08);
+      --success: #22C55E;
+      --success-light: rgba(34, 197, 94, 0.1);
+      --radius: 10px;
+      --sidebar-width: 240px;
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    html { font-size: 16px; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* Layout */
+    .app {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-width);
+      border-right: 1px solid var(--border);
+      padding: 1.5rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      flex-shrink: 0;
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .sidebar__brand {
+      font-weight: 700;
+      font-size: 1.125rem;
+      padding: 0.5rem 0.75rem 1.25rem;
+      letter-spacing: -0.02em;
+    }
+
+    .sidebar__brand span { color: var(--accent); }
+
+    .sidebar__nav-label {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      padding: 0.75rem 0.75rem 0.375rem;
+    }
+
+    .sidebar__link {
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
+      padding: 0.625rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .sidebar__link:hover {
+      background: var(--accent-hover);
+      color: var(--text);
+    }
+
+    .sidebar__link--active {
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+
+    .sidebar__link svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .sidebar__footer {
+      margin-top: auto;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    /* Mobile top nav */
+    .mobile-header {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.875rem 1rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .mobile-header__brand {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .mobile-header__brand span { color: var(--accent); }
+
+    .menu-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.375rem 0.5rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 200;
+    }
+
+    .sidebar-overlay.is-open { display: block; }
+
+    /* Main */
+    .main {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .main__header {
+      padding: 1.5rem 2rem 1rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .main__title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .main__subtitle {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-top: 0.125rem;
+    }
+
+    .main__content {
+      padding: 1.5rem 2rem 2.5rem;
+      flex: 1;
+    }
+
+    /* Role toggle */
+    .role-toggle {
+      display: inline-flex;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    .role-toggle__btn {
+      padding: 0.4375rem 1rem;
+      font-family: var(--font);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .role-toggle__btn:not(:last-child) {
+      border-right: 1px solid var(--border);
+    }
+
+    .role-toggle__btn:hover {
+      background: var(--accent-hover);
+      color: var(--text);
+    }
+
+    .role-toggle__btn.is-active {
+      background: var(--accent);
+      color: #FFFFFF;
+    }
+
+    .role-toggle__btn.is-active:hover {
+      background: #6B4FE0;
+      color: #FFFFFF;
+    }
+
+    /* Views */
+    .payroll-view { display: none; }
+    .payroll-view.is-active { display: block; }
+
+    /* Section */
+    .section {
+      margin-bottom: 1.75rem;
+    }
+
+    .section__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 0.875rem;
+    }
+
+    .section__title {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .section__actions {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    /* Search */
+    .search-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex: 1;
+      max-width: 300px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      font-family: var(--font);
+      font-size: 0.875rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .search-input:focus-visible {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+
+    /* Buttons */
+    .btn {
+      font-family: var(--font);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      padding: 0.4375rem 0.875rem;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.15s, background 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn--primary {
+      background: var(--text);
+      color: #FFFFFF;
+    }
+
+    .btn--primary:hover { opacity: 0.85; }
+
+    .btn--secondary {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--text);
+    }
+
+    .btn--secondary:hover { background: #F5F5F5; }
+
+    /* Salary Breakdown Card */
+    .salary-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .salary-card__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+
+    .salary-card__title {
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .salary-card__lock {
+      width: 16px;
+      height: 16px;
+      color: var(--text-muted);
+    }
+
+    .salary-card__read-only {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      background: #F5F5F5;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    .salary-breakdown {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .salary-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .salary-item__label {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .salary-item__value {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      text-align: right;
+    }
+
+    .salary-net {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .salary-net__label {
+      font-size: 0.9375rem;
+      font-weight: 600;
+    }
+
+    .salary-net__value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .salary-card__actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    /* Payslip history */
+    .payslip-history {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .payslip-history__title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .payslip-list {
+      list-style: none;
+    }
+
+    .payslip-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.875rem 0;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+      cursor: pointer;
+    }
+
+    .payslip-item:last-child { border-bottom: none; }
+
+    .payslip-item:hover { background: var(--accent-hover); }
+
+    .payslip-item__info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .payslip-item__month {
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .payslip-item__amount {
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+    }
+
+    .payslip-item__download {
+      cursor: pointer;
+      color: var(--accent);
+      transition: opacity 0.15s;
+    }
+
+    .payslip-item__download:hover { opacity: 0.8; }
+
+    /* Table */
+    .table-wrap {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    thead {
+      background: #FAFAFA;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    th.is-right {
+      text-align: right;
+    }
+
+    td {
+      padding: 0.8125rem 1rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    tbody tr:last-child td { border-bottom: none; }
+
+    tbody tr {
+      transition: background 0.15s;
+    }
+
+    tbody tr:hover { background: var(--accent-hover); }
+
+    .table-amount {
+      text-align: right;
+      font-family: 'Courier New', monospace;
+      font-weight: 500;
+    }
+
+    .table-actions {
+      display: flex;
+      gap: 0.375rem;
+    }
+
+    .table-actions .btn {
+      padding: 0.25rem 0.625rem;
+      font-size: 0.75rem;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal.is-open {
+      display: flex;
+    }
+
+    .modal__content {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      max-width: 500px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal__header {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal__form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .modal__label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 0.375rem;
+      color: var(--text);
+    }
+
+    .modal__input {
+      width: 100%;
+      padding: 0.75rem;
+      font-family: var(--font);
+      font-size: 0.875rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .modal__input:focus-visible {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+
+    .modal__calc {
+      padding: 1rem;
+      background: #FAFAFA;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal__calc-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.875rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal__calc-row:last-child {
+      margin-bottom: 0;
+      padding-top: 0.5rem;
+      border-top: 1px solid var(--border);
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .modal__actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: flex-end;
+    }
+
+    /* Success confirmation */
+    .success-check {
+      display: none;
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: var(--success);
+      color: #FFFFFF;
+      padding: 0.75rem 1.25rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      z-index: 999;
+      animation: slideIn 0.3s ease;
+    }
+
+    .success-check.is-visible {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(8px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .salary-breakdown {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .app { flex-direction: column; }
+
+      .sidebar {
+        position: fixed;
+        left: -280px;
+        top: 0;
+        z-index: 300;
+        height: 100vh;
+        transition: left 0.25s ease;
+        box-shadow: none;
+      }
+
+      .sidebar.is-open {
+        left: 0;
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
+      }
+
+      .mobile-header { display: flex; }
+
+      .main__header { padding: 1rem; }
+      .main__content { padding: 1rem; }
+
+      .main__title { font-size: 1.25rem; }
+
+      .search-wrap {
+        max-width: 100%;
+        margin: 1rem 0 0 0;
+      }
+
+      .modal__content {
+        padding: 1.5rem;
+      }
+
+      .salary-breakdown {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .main__header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .role-toggle__btn {
+        padding: 0.4375rem 0.625rem;
+        font-size: 0.75rem;
+      }
+
+      .modal__content {
+        padding: 1.25rem;
+      }
+
+      table {
+        font-size: 0.8125rem;
+      }
+
+      th, td {
+        padding: 0.625rem 0.75rem;
+      }
+
+      .section__header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .search-wrap {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+      <div class="sidebar__brand">HR<span>MS</span></div>
+
+      <div class="sidebar__nav-label">Menu</div>
+      <a href="dashboard.html" class="sidebar__link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a href="profile.html" class="sidebar__link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Profile
+      </a>
+      <a href="attendance.html" class="sidebar__link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Attendance
+      </a>
+      <a href="leave.html" class="sidebar__link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Leave
+      </a>
+      <a href="payroll.html" class="sidebar__link sidebar__link--active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Payroll
+      </a>
+
+      <div class="sidebar__footer">
+        <button class="sidebar__link" id="sidebarLogout">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Logout
+        </button>
+      </div>
+    </aside>
+
+    <div class="main">
+      <!-- Mobile header -->
+      <header class="mobile-header">
+        <div class="mobile-header__brand">HR<span>MS</span></div>
+        <button class="menu-btn" id="menuBtn" aria-label="Open navigation menu" aria-expanded="false" aria-controls="sidebar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+      </header>
+
+      <header class="main__header">
+        <div>
+          <h1 class="main__title" id="pageTitle">Payroll Management</h1>
+          <p class="main__subtitle" id="pageSubtitle">View and manage salary information</p>
+        </div>
+        <div class="role-toggle" role="group" aria-label="Switch payroll view">
+          <button class="role-toggle__btn is-active" id="btnEmployee" role="tab" aria-pressed="true">Employee</button>
+          <button class="role-toggle__btn" id="btnAdmin" role="tab" aria-pressed="false">Admin / HR</button>
+        </div>
+      </header>
+
+      <main class="main__content">
+
+        <!-- EMPLOYEE VIEW -->
+        <div class="payroll-view is-active" id="employeeView" role="tabpanel" aria-labelledby="btnEmployee">
+
+          <!-- Salary Breakdown -->
+          <div class="salary-card">
+            <div class="salary-card__header">
+              <div class="salary-card__title">
+                <span>Current Salary Breakdown</span>
+              </div>
+              <span class="salary-card__read-only">
+                <svg class="salary-card__lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                Read-only
+              </span>
+            </div>
+
+            <div class="salary-breakdown">
+              <div class="salary-item">
+                <span class="salary-item__label">Basic Salary</span>
+                <span class="salary-item__value">₹50,000</span>
+              </div>
+              <div class="salary-item">
+                <span class="salary-item__label">HRA</span>
+                <span class="salary-item__value">₹10,000</span>
+              </div>
+              <div class="salary-item">
+                <span class="salary-item__label">Allowances</span>
+                <span class="salary-item__value">₹5,000</span>
+              </div>
+              <div class="salary-item">
+                <span class="salary-item__label">Deductions</span>
+                <span class="salary-item__value">–₹8,500</span>
+              </div>
+            </div>
+
+            <div class="salary-net">
+              <span class="salary-net__label">Net Salary</span>
+              <span class="salary-net__value">₹56,500</span>
+            </div>
+
+            <div class="salary-card__actions" style="margin-top: 1.5rem;">
+              <button class="btn btn--primary" id="downloadPayslip">Download Latest Payslip</button>
+            </div>
+          </div>
+
+          <!-- Payslip History -->
+          <div class="payslip-history">
+            <div class="payslip-history__title">Payslip History</div>
+            <ul class="payslip-list" id="payslipList">
+              <!-- Populated by JS -->
+            </ul>
+          </div>
+        </div>
+
+        <!-- ADMIN VIEW -->
+        <div class="payroll-view" id="adminView" role="tabpanel" aria-labelledby="btnAdmin" hidden>
+
+          <!-- Search & Actions -->
+          <div class="section">
+            <div class="section__header">
+              <h2 class="section__title">Employee Payroll</h2>
+              <div class="search-wrap">
+                <input type="text" class="search-input" id="employeeSearch" placeholder="Search by name or ID...">
+              </div>
+            </div>
+
+            <!-- Payroll Table -->
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th class="is-right">Basic</th>
+                    <th class="is-right">HRA</th>
+                    <th class="is-right">Allowances</th>
+                    <th class="is-right">Deductions</th>
+                    <th class="is-right">Net Pay</th>
+                    <th style="text-align: center;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="payrollTableBody">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div class="modal" id="editModal">
+    <div class="modal__content">
+      <div class="modal__header" id="modalTitle">Edit Payroll Entry</div>
+      <form id="editForm">
+        <div class="modal__form-group">
+          <label class="modal__label">Employee</label>
+          <div style="padding: 0.75rem; background: #FAFAFA; border-radius: 8px; font-size: 0.875rem;" id="modalEmployeeName"></div>
+        </div>
+
+        <div class="modal__form-group">
+          <label for="editBasic" class="modal__label">Basic Salary (₹)</label>
+          <input type="number" id="editBasic" class="modal__input" required>
+        </div>
+
+        <div class="modal__form-group">
+          <label for="editHRA" class="modal__label">HRA (₹)</label>
+          <input type="number" id="editHRA" class="modal__input" required>
+        </div>
+
+        <div class="modal__form-group">
+          <label for="editAllowances" class="modal__label">Allowances (₹)</label>
+          <input type="number" id="editAllowances" class="modal__input" required>
+        </div>
+
+        <div class="modal__form-group">
+          <label for="editDeductions" class="modal__label">Deductions (₹)</label>
+          <input type="number" id="editDeductions" class="modal__input" required>
+        </div>
+
+        <!-- Calculation Display -->
+        <div class="modal__calc">
+          <div class="modal__calc-row">
+            <span>Total Earnings:</span>
+            <span id="calcEarnings">₹65,000</span>
+          </div>
+          <div class="modal__calc-row">
+            <span>Total Deductions:</span>
+            <span id="calcDeductions">₹8,500</span>
+          </div>
+          <div class="modal__calc-row">
+            <span>Net Pay:</span>
+            <span id="calcNetPay">₹56,500</span>
+          </div>
+        </div>
+
+        <div class="modal__actions">
+          <button type="button" class="btn btn--secondary" id="cancelEdit">Cancel</button>
+          <button type="submit" class="btn btn--primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Success Check -->
+  <div class="success-check" id="successCheck">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+    <span>Payroll updated successfully</span>
+  </div>
+
+  <script>
+    /* ── Sample Data ── */
+    const employees = [
+      { id: 1, name: 'Priya Sharma',   basic: 50000, hra: 10000, allowances: 5000, deductions: 8500 },
+      { id: 2, name: 'Rahul Mehta',    basic: 45000, hra: 9000,  allowances: 4500, deductions: 7200 },
+      { id: 3, name: 'Ananya Patel',   basic: 55000, hra: 11000, allowances: 5500, deductions: 9200 },
+      { id: 4, name: 'Vikram Singh',   basic: 48000, hra: 9600,  allowances: 4800, deductions: 8000 },
+      { id: 5, name: 'Sneha Reddy',    basic: 52000, hra: 10400, allowances: 5200, deductions: 8700 },
+      { id: 6, name: 'Arjun Nair',     basic: 46000, hra: 9200,  allowances: 4600, deductions: 7700 },
+    ];
+
+    const payslipHistory = [
+      { month: 'June 2026', netPay: 56500 },
+      { month: 'May 2026', netPay: 56500 },
+      { month: 'April 2026', netPay: 56200 },
+      { month: 'March 2026', netPay: 56500 },
+      { month: 'February 2026', netPay: 55800 },
+    ];
+
+    /* ── Helpers ── */
+    function formatCurrency(amount) {
+      return `₹${amount.toLocaleString('en-IN')}`;
+    }
+
+    function calculateNetPay(basic, hra, allowances, deductions) {
+      return basic + hra + allowances - deductions;
+    }
+
+    function showSuccess() {
+      const check = document.getElementById('successCheck');
+      check.classList.add('is-visible');
+      setTimeout(() => check.classList.remove('is-visible'), 2500);
+    }
+
+    /* ── Render payslip history ── */
+    function renderPayslipHistory() {
+      const list = document.getElementById('payslipList');
+      list.innerHTML = payslipHistory.map(p => `
+        <li class="payslip-item" tabindex="0">
+          <div class="payslip-item__info">
+            <div class="payslip-item__month">${p.month}</div>
+            <div class="payslip-item__amount">Net Pay: ${formatCurrency(p.netPay)}</div>
+          </div>
+          <svg class="payslip-item__download" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </li>
+      `).join('');
+    }
+
+    /* ── Render payroll table ── */
+    function renderPayrollTable(filter = '') {
+      const body = document.getElementById('payrollTableBody');
+      const filtered = employees.filter(e =>
+        e.name.toLowerCase().includes(filter.toLowerCase()) ||
+        e.id.toString().includes(filter)
+      );
+
+      body.innerHTML = filtered.map(e => {
+        const netPay = calculateNetPay(e.basic, e.hra, e.allowances, e.deductions);
+        return `
+          <tr data-employee-id="${e.id}">
+            <td><strong>${e.name}</strong></td>
+            <td class="table-amount">${formatCurrency(e.basic)}</td>
+            <td class="table-amount">${formatCurrency(e.hra)}</td>
+            <td class="table-amount">${formatCurrency(e.allowances)}</td>
+            <td class="table-amount">${formatCurrency(e.deductions)}</td>
+            <td class="table-amount"><strong>${formatCurrency(netPay)}</strong></td>
+            <td style="text-align: center;">
+              <button class="btn btn--secondary edit-btn" data-id="${e.id}">Edit</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    /* ── Role toggle ── */
+    const btnEmployee = document.getElementById('btnEmployee');
+    const btnAdmin = document.getElementById('btnAdmin');
+    const employeeView = document.getElementById('employeeView');
+    const adminView = document.getElementById('adminView');
+    const pageTitle = document.getElementById('pageTitle');
+    const pageSubtitle = document.getElementById('pageSubtitle');
+
+    function switchRole(role) {
+      const isEmployee = role === 'employee';
+      btnEmployee.classList.toggle('is-active', isEmployee);
+      btnAdmin.classList.toggle('is-active', !isEmployee);
+      btnEmployee.setAttribute('aria-pressed', isEmployee);
+      btnAdmin.setAttribute('aria-pressed', !isEmployee);
+      employeeView.classList.toggle('is-active', isEmployee);
+      adminView.classList.toggle('is-active', !isEmployee);
+      employeeView.hidden = !isEmployee;
+      adminView.hidden = isEmployee;
+      pageTitle.textContent = isEmployee ? 'Payroll Management' : 'Admin Payroll Control';
+      pageSubtitle.textContent = isEmployee
+        ? 'View and manage salary information'
+        : 'Manage payroll for all employees';
+    }
+
+    btnEmployee.addEventListener('click', () => switchRole('employee'));
+    btnAdmin.addEventListener('click', () => switchRole('admin'));
+
+    /* ── Edit Modal ── */
+    const editModal = document.getElementById('editModal');
+    const editForm = document.getElementById('editForm');
+    const cancelEdit = document.getElementById('cancelEdit');
+    let currentEditId = null;
+
+    const editBasic = document.getElementById('editBasic');
+    const editHRA = document.getElementById('editHRA');
+    const editAllowances = document.getElementById('editAllowances');
+    const editDeductions = document.getElementById('editDeductions');
+
+    function updateCalculation() {
+      const basic = parseFloat(editBasic.value) || 0;
+      const hra = parseFloat(editHRA.value) || 0;
+      const allowances = parseFloat(editAllowances.value) || 0;
+      const deductions = parseFloat(editDeductions.value) || 0;
+
+      const earnings = basic + hra + allowances;
+      const netPay = earnings - deductions;
+
+      document.getElementById('calcEarnings').textContent = formatCurrency(earnings);
+      document.getElementById('calcDeductions').textContent = formatCurrency(deductions);
+      document.getElementById('calcNetPay').textContent = formatCurrency(netPay);
+    }
+
+    editBasic.addEventListener('input', updateCalculation);
+    editHRA.addEventListener('input', updateCalculation);
+    editAllowances.addEventListener('input', updateCalculation);
+    editDeductions.addEventListener('input', updateCalculation);
+
+    function openEditModal(empId) {
+      const emp = employees.find(e => e.id === empId);
+      if (!emp) return;
+
+      currentEditId = empId;
+      document.getElementById('modalEmployeeName').textContent = emp.name;
+      editBasic.value = emp.basic;
+      editHRA.value = emp.hra;
+      editAllowances.value = emp.allowances;
+      editDeductions.value = emp.deductions;
+
+      updateCalculation();
+      editModal.classList.add('is-open');
+      editBasic.focus();
+    }
+
+    function closeEditModal() {
+      editModal.classList.remove('is-open');
+      currentEditId = null;
+      editForm.reset();
+    }
+
+    editForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!currentEditId) return;
+
+      const emp = employees.find(e => e.id === currentEditId);
+      if (emp) {
+        emp.basic = parseFloat(editBasic.value);
+        emp.hra = parseFloat(editHRA.value);
+        emp.allowances = parseFloat(editAllowances.value);
+        emp.deductions = parseFloat(editDeductions.value);
+      }
+
+      renderPayrollTable();
+      closeEditModal();
+      showSuccess();
+    });
+
+    cancelEdit.addEventListener('click', closeEditModal);
+
+    // Close modal on backdrop click
+    editModal.addEventListener('click', (e) => {
+      if (e.target === editModal) closeEditModal();
+    });
+
+    /* ── Edit button handlers ── */
+    document.getElementById('payrollTableBody').addEventListener('click', (e) => {
+      const btn = e.target.closest('.edit-btn');
+      if (btn) {
+        const empId = Number(btn.dataset.id);
+        openEditModal(empId);
+      }
+    });
+
+    /* ── Search ── */
+    document.getElementById('employeeSearch').addEventListener('input', (e) => {
+      renderPayrollTable(e.target.value);
+    });
+
+    /* ── Download payslip ── */
+    document.getElementById('downloadPayslip').addEventListener('click', () => {
+      alert('Payslip download initiated (mock action)');
+    });
+
+    /* ── Logout ── */
+    document.getElementById('sidebarLogout').addEventListener('click', () => {
+      alert('Logged out');
+    });
+
+    /* ── Mobile sidebar ── */
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const menuBtn = document.getElementById('menuBtn');
+
+    function openSidebar() {
+      sidebar.classList.add('is-open');
+      overlay.classList.add('is-open');
+      menuBtn.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeSidebar() {
+      sidebar.classList.remove('is-open');
+      overlay.classList.remove('is-open');
+      menuBtn.setAttribute('aria-expanded', 'false');
+    }
+
+    menuBtn.addEventListener('click', () => {
+      sidebar.classList.contains('is-open') ? closeSidebar() : openSidebar();
+    });
+    overlay.addEventListener('click', closeSidebar);
+
+    /* ── Init ── */
+    renderPayslipHistory();
+    renderPayrollTable();
+  </script>
+</body>
+</html>
