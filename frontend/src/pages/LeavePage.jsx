@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import LeaveBalanceCard from '../components/LeaveBalanceCard';
 import LeaveHistoryTable from '../components/LeaveHistoryTable';
 import LeaveRequestModal from '../components/LeaveRequestModal';
-import { leaveData, leaveBalances } from '../data/leaveData';
+import { leaveData, leaveBalances } from '../data/leaveData.jsx';
 import '../styles/leave.css';
 
 const LeavePage = () => {
