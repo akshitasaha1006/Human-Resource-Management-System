@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HRMS Profile</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #FFFFFF;
+      --text: #111111;
+      --text-muted: #555555;
+      --border: #E5E5E5;
+      --accent: #7C5CFC;
+      --accent-light: rgba(124, 92, 252, 0.12);
+      --accent-hover: rgba(124, 92, 252, 0.08);
+      --radius: 10px;
+      --sidebar-width: 240px;
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    html { font-size: 16px; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.5; min-height: 100vh; }
+    a { color: inherit; text-decoration: none; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .app { display: flex; min-height: 100vh; }
+    .sidebar { width: var(--sidebar-width); border-right: 1px solid var(--border); padding: 1.5rem 1rem; display: flex; flex-direction: column; gap: 0.25rem; flex-shrink: 0; background: var(--bg); position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+    .sidebar__brand { font-weight: 700; font-size: 1.125rem; padding: 0.5rem 0.75rem 1.25rem; letter-spacing: -0.02em; }
+    .sidebar__brand span { color: var(--accent); }
+    .sidebar__nav-label { font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); padding: 0.75rem 0.75rem 0.375rem; }
+    .sidebar__link { display: flex; align-items: center; gap: 0.625rem; padding: 0.625rem 0.75rem; border-radius: 8px; font-size: 0.875rem; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: background 0.15s, color 0.15s; }
+    .sidebar__link:hover { background: var(--accent-hover); color: var(--text); }
+    .sidebar__link--active { background: var(--accent-light); color: var(--accent); }
+    .sidebar__footer { margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border); }
+    .mobile-header { display: none; align-items: center; justify-content: space-between; padding: 0.875rem 1rem; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 100; }
+    .mobile-header__brand { font-weight: 700; font-size: 1rem; }
+    .menu-btn { background: none; border: 1px solid var(--border); border-radius: 8px; padding: 0.375rem 0.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.3); z-index: 200; }
+    .sidebar-overlay.is-open { display: block; }
+    .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .main__header { padding: 1.5rem 2rem 1rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .main__title { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; }
+    .main__subtitle { font-size: 0.875rem; color: var(--text-muted); margin-top: 0.125rem; }
+    .main__content { padding: 1.5rem 2rem 2.5rem; flex: 1; }
+    .profile-grid { display: grid; grid-template-columns: 320px 1fr; gap: 1.5rem; }
+    .card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; }
+    .profile-avatar { display: grid; place-items: center; padding: 1.5rem; text-align: center; }
+    .profile-avatar img { border-radius: 999px; width: 140px; height: 140px; object-fit: cover; }
+    .profile-avatar h2 { margin-top: 1rem; font-size: 1.25rem; }
+    .profile-avatar p { color: var(--text-muted); margin-top: 0.5rem; }
+    .profile-details { display: grid; gap: 1rem; }
+    .detail-row { display: grid; grid-template-columns: 160px 1fr; gap: 1rem; padding: 0.85rem 0; border-bottom: 1px solid #f3f4f6; }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-label { color: var(--text-muted); font-weight: 600; }
+    .detail-value { font-weight: 600; }
+    .section-title { font-size: 1rem; font-weight: 700; margin-bottom: 1rem; }
+    .card-list { display: grid; gap: 1rem; }
+    .card-list .card { padding: 1.25rem; }
+    .card-list .stat-item { display: flex; justify-content: space-between; gap: 1rem; padding: 0.9rem 0; border-bottom: 1px solid #f3f4f6; }
+    .card-list .stat-item:last-child { border-bottom: none; }
+    .btn { font-family: var(--font); font-size: 0.875rem; font-weight: 600; padding: 0.85rem 1.25rem; border-radius: 10px; border: none; cursor: pointer; background: var(--accent); color: #fff; }
+    @media (max-width: 1024px) { .profile-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { .app { flex-direction: column; } .sidebar { position: fixed; left: -280px; top: 0; z-index: 300; height: 100vh; transition: left 0.25s ease; } .sidebar.is-open { left: 0; box-shadow: 4px 0 24px rgba(0,0,0,0.12);} .mobile-header { display: flex; } .main__header { padding: 1rem; } .main__content { padding: 1rem; }}
+  </style>
+</head>
+<body>
+  <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+  <div class="app">
+    <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+      <div class="sidebar__brand">HR<span>MS</span></div>
+      <div class="sidebar__nav-label">Menu</div>
+      <a href="dashboard.html" class="sidebar__link">Dashboard</a>
+      <a href="profile.html" class="sidebar__link sidebar__link--active" aria-current="page">Profile</a>
+      <a href="attendance.html" class="sidebar__link">Attendance</a>
+      <a href="leave.html" class="sidebar__link">Leave</a>
+      <a href="payroll.html" class="sidebar__link">Payroll</a>
+      <div class="sidebar__footer">
+        <button class="sidebar__link" id="sidebarLogout">Logout</button>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="mobile-header">
+        <div class="mobile-header__brand">HR<span>MS</span></div>
+        <button class="menu-btn" id="menuBtn" aria-label="Open navigation menu" aria-expanded="false" aria-controls="sidebar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+      </header>
+
+      <header class="main__header">
+        <div>
+          <h1 class="main__title">Employee Profile</h1>
+          <p class="main__subtitle">View and manage your personal details, documents, and role information.</p>
+        </div>
+        <button id="editProfileBtn" class="btn">Edit Profile</button>
+      </header>
+
+      <main class="main__content">
+        <div class="profile-grid">
+          <section class="card profile-avatar">
+            <img src="https://i.pravatar.cc/180?img=12" alt="Employee Photo">
+            <h2>Priya Sharma</h2>
+            <p>Senior Developer</p>
+          </section>
+
+          <section class="card">
+            <div class="section-title">Personal Information</div>
+            <div class="profile-details" id="profileDetails">
+              <div class="detail-row"><span class="detail-label">Email</span><span class="detail-value">priya.sharma@example.com</span></div>
+              <div class="detail-row"><span class="detail-label">Phone</span><span class="detail-value">+91 98765 43210</span></div>
+              <div class="detail-row"><span class="detail-label">Address</span><span class="detail-value">Kolkata, India</span></div>
+              <div class="detail-row"><span class="detail-label">Department</span><span class="detail-value">Engineering</span></div>
+              <div class="detail-row"><span class="detail-label">Reporting Manager</span><span class="detail-value">Amit Joshi</span></div>
+            </div>
+          </section>
+        </div>
+
+        <section class="card card-list">
+          <div class="section-title">Job Details</div>
+          <div class="stat-item"><span>Employee ID</span><strong>EMP-0128</strong></div>
+          <div class="stat-item"><span>Designation</span><strong>Senior Developer</strong></div>
+          <div class="stat-item"><span>Join Date</span><strong>15 Jan 2025</strong></div>
+          <div class="stat-item"><span>Location</span><strong>Kolkata Office</strong></div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const menuBtn = document.getElementById('menuBtn');
+    const logoutBtn = document.getElementById('sidebarLogout');
+    const editBtn = document.getElementById('editProfileBtn');
+    const profileDetails = document.getElementById('profileDetails');
+
+    function openSidebar() { sidebar.classList.add('is-open'); overlay.classList.add('is-open'); menuBtn.setAttribute('aria-expanded', 'true'); }
+    function closeSidebar() { sidebar.classList.remove('is-open'); overlay.classList.remove('is-open'); menuBtn.setAttribute('aria-expanded', 'false'); }
+    menuBtn.addEventListener('click', () => sidebar.classList.contains('is-open') ? closeSidebar() : openSidebar());
+    overlay.addEventListener('click', closeSidebar);
+    logoutBtn.addEventListener('click', () => alert('Logged out (placeholder)'));
+
+    let editing = false;
+    editBtn.addEventListener('click', () => {
+      editing = !editing;
+      editBtn.textContent = editing ? 'Save Profile' : 'Edit Profile';
+      toggleProfileFields(editing);
+    });
+
+    function toggleProfileFields(enabled) {
+      const rows = Array.from(profileDetails.querySelectorAll('.detail-row'));
+      rows.forEach(row => {
+        const valueCell = row.querySelector('.detail-value');
+        if (!valueCell) return;
+
+        if (enabled) {
+          const value = valueCell.textContent;
+          const field = document.createElement('input');
+          field.type = 'text';
+          field.value = value;
+          field.className = 'detail-input';
+          field.style.width = '100%';
+          field.style.padding = '0.75rem';
+          field.style.borderRadius = '10px';
+          field.style.border = '1px solid #d1d5db';
+          field.style.fontFamily = 'var(--font)';
+          field.style.fontSize = '0.95rem';
+          row.replaceChild(field, valueCell);
+        } else {
+          const input = row.querySelector('input');
+          if (!input) return;
+          const span = document.createElement('span');
+          span.className = 'detail-value';
+          span.textContent = input.value;
+          row.replaceChild(span, input);
+        }
+      });
+    }
+  </script>
+</body>
+</html>
